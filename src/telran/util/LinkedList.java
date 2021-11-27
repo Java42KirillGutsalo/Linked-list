@@ -23,6 +23,13 @@ public class LinkedList<T> implements List<T> {
 	private Node<T> tail; // reference to the last element
 	private class LinkedListIterator implements Iterator<T> {
 		Node<T> current = head;
+		/* V.R.
+		 *  The variable flagNext has to be initialised by false. It prevents
+		 *  the following incorrect case:
+		 *  Iterator<T> itr = arList.iterator();
+		 *  // Call remove without next().
+		 *  itr.remove();
+		 */
 		boolean flagNext;
 		@Override
 		public boolean hasNext() {
