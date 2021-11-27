@@ -3,6 +3,7 @@ package telran.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
 public class LinkedList<T> implements List<T> {
@@ -22,6 +23,7 @@ public class LinkedList<T> implements List<T> {
 	private Node<T> tail; // reference to the last element
 	private class LinkedListIterator implements Iterator<T> {
 		Node<T> current = head;
+		boolean flagNext;
 		@Override
 		public boolean hasNext() {
 			
@@ -30,20 +32,28 @@ public class LinkedList<T> implements List<T> {
 
 		@Override
 		public T next() {
+			if(current == null) {
+				throw new NoSuchElementException();
+			}
 			//return current T object
 			T res = current.obj;
 			//FIXME check res and throwing exception
 			//moves to a next current
 			current = current.next;
+			flagNext = true;
 			return res;
 		}
 		@Override
 		public void remove() {
+			if(flagNext == false) {
+				throw new IllegalStateException();
+			}
 			if(current == null) {
 				removeNode(tail);
 			} else {
 				removeNode(current.prev);
 			}
+			flagNext = false;
 			//removes element that has been returned by the last next call
 			//that is previous of the current. But if current is null, then tail
 			//should be removed
