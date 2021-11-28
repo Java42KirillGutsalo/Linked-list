@@ -3,11 +3,10 @@ package telran.util;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.Predicate;
 
-public class LinkedList<T> implements List<T> {
-	private int size;
+public class LinkedList<T> extends AbstractList<T> {
+	
 
 	private static class Node<T> {
 		T obj;
@@ -23,7 +22,6 @@ public class LinkedList<T> implements List<T> {
 	private Node<T> tail; // reference to the last element
 	private class LinkedListIterator implements Iterator<T> {
 		Node<T> current = head;
-		boolean flagNext;
 		@Override
 		public boolean hasNext() {
 			
@@ -33,7 +31,7 @@ public class LinkedList<T> implements List<T> {
 		@Override
 		public T next() {
 			if(current == null) {
-				throw new NoSuchElementException();
+				noSuchElementException();
 			}
 			//return current T object
 			T res = current.obj;
@@ -43,21 +41,23 @@ public class LinkedList<T> implements List<T> {
 			flagNext = true;
 			return res;
 		}
+		
 		@Override
 		public void remove() {
-			if(flagNext == false) {
-				throw new IllegalStateException();
-			}
-			if(current == null) {
+			 if(!flagNext) {
+				 illegalStateException();
+			 }
+			//removes element that has been returned by the last next call
+			//that is previous of the current. But if current is null, then tail
+			//should be removed
+			if (current == null) {
 				removeNode(tail);
 			} else {
 				removeNode(current.prev);
 			}
 			flagNext = false;
-			//removes element that has been returned by the last next call
-			//that is previous of the current. But if current is null, then tail
-			//should be removed
 		}
+		
 	}
 	@Override
 	public void add(T element) {
@@ -100,10 +100,7 @@ public class LinkedList<T> implements List<T> {
 		}
 		return current;
 	}
-	private boolean isValidIndex(int index) {
-		
-		return index >=0 && index < size;
-	}
+	
 	@Override
 	public boolean add(int index, T element) {
 		//O[N]
@@ -139,11 +136,7 @@ public class LinkedList<T> implements List<T> {
 		head = newNode;
 		
 	}
-	@Override
-	public int size() {
-//O[1]
-		return size;
-	}
+	
 
 	@Override
 	public T get(int index) {
@@ -196,16 +189,14 @@ public class LinkedList<T> implements List<T> {
 	@Override
 	public boolean removeIf(Predicate<T> predicate) {
 		//O[N]
-		//write removeIf implementation based on iterator 
-		//To apply items a., b., c. in the slide #18 with iterator.remove()
-		int prevSize = size;
 		Iterator<T> it = iterator();
-		while (it.hasNext()) {
+		int oldSize = size;
+		while(it.hasNext()) {
 			if (predicate.test(it.next())) {
 				it.remove();
 			}
 		}
-		return prevSize > size;
+		return oldSize > size;
 	}
 
 	private T removeNode(Node<T> current) {
@@ -294,6 +285,7 @@ public class LinkedList<T> implements List<T> {
 		size = 0;
 		
 	}
+	@Override
 	public Iterator<T> iterator() {
 		
 		return new LinkedListIterator();
